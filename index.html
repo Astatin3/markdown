@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Content</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.6.1/github-markdown-dark.min.css" integrity="sha512-mzPe5Bxap921sKCNI3lXEi5FxCue4M1Ei65ZVFi1UdCMnr4+BFOpBuWnfpJ8WLBxvyhf7z45Jsa5jWiseE57rg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body style="margin: 0">
+
+<pre id="content" class="markdown-body"></pre>
+
+<script type="module">
+    import markdownit from 'https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm'
+    import mdk from 'https://cdn.jsdelivr.net/npm/markdown-it-katex@2.0.3/+esm'
+
+    const md = markdownit({
+        html: true,
+        linkify: true,
+        typographer: true
+    })
+    md.use(mdk)
+
+    const content = document.getElementById('content');
+
+    fetch('/content')
+        .then(response => response.text())
+        .then(data => content.innerHTML = md.render(data));
+
+    const evtSource = new EventSource("/events");
+    evtSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log(data);
+        content.innerHTML = md.render(data.content);
+    }
+</script>
+</body>
+</html>

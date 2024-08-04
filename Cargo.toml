@@ -1,0 +1,18 @@
+[package]
+name = "markdown"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+notify = "6.1.1"
+blocking = "1.6.1"
+failure = "0.1.8"
+hotwatch = "0.5.0"
+time = "0.3.36"
+rocket = { version = "0.5.1", features = ["json"] }
+serde = { version = "1.0.204", features = ["derive"] }
+
+
+[[bin]]
+name = "markdown"
+path = "src/main.rs"
