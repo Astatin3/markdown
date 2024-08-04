@@ -48,11 +48,15 @@ async fn events(queue: &State<Sender<FileChange>>, mut end: Shutdown) -> EventSt
     }
 }
 
+fn get_filepath() -> String {
+    let args = env::args().collect::<Vec<String>>();
+    return String::from(args[1].as_str());
+}
+
 #[launch]
 fn rocket() -> _ {
-    let file_path = Path::new("/tmp/file.md");
-    
-    let file_content = Arc::new(Mutex::new(std::fs::read_to_string(file_path).unwrap()));
+
+    let file_content = Arc::new(Mutex::new(std::fs::read_to_string(get_filepath()).unwrap()));
     let file_content_clone = Arc::clone(&file_content);
 
     let (tx, _) = channel::<FileChange>(1024);
@@ -62,9 +66,10 @@ fn rocket() -> _ {
 
     std::thread::spawn(move || {
         let mut watch = Hotwatch::new().unwrap();
-        watch.watch(file_path, move |_| {
 
-            let content = std::fs::read_to_string(file_path).unwrap();
+        watch.watch(get_filepath(), move |_| {
+
+            let content = std::fs::read_to_string(get_filepath()).unwrap();
 
             *file_content_clone.lock().unwrap() = content.clone();
             let _ = tx_clone.send(FileChange { content });
